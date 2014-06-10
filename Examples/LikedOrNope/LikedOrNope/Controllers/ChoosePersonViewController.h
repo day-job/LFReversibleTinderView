@@ -25,10 +25,13 @@
 #import <UIKit/UIKit.h>
 #import "ChoosePersonView.h"
 
+#define AntiARCRetain(...) void *retainedThing = (__bridge_retained void *)__VA_ARGS__; retainedThing = retainedThing
+
 @interface ChoosePersonViewController : UIViewController <MDCSwipeToChooseDelegate>
 
 @property (nonatomic, strong) Person *currentPerson;
 @property (nonatomic, strong) ChoosePersonView *frontCardView;
 @property (nonatomic, strong) ChoosePersonView *backCardView;
+@property (nonatomic, strong) ChoosePersonView *previousCardView;
 
 @end

@@ -54,13 +54,13 @@ static const CGFloat ChoosePersonButtonVerticalPadding = 20.f;
 
     // Display the first ChoosePersonView in front. Users can swipe to indicate
     // whether they like or dislike the person displayed.
-    self.frontCardView = [self popPersonViewWithFrame:[self frontCardViewFrame]];
+	self.frontCardView = [self popPersonViewWithFrame:[self frontCardViewFrame] frontView:nil];
     [self.view addSubview:self.frontCardView];
 
     // Display the second ChoosePersonView in back. This view controller uses
     // the MDCSwipeToChooseDelegate protocol methods to update the front and
     // back views after each user swipe.
-    self.backCardView = [self popPersonViewWithFrame:[self backCardViewFrame]];
+	self.backCardView = [self popPersonViewWithFrame:[self backCardViewFrame] frontView:self.frontCardView];
     [self.view insertSubview:self.backCardView belowSubview:self.frontCardView];
 
     // Add buttons to programmatically swipe the view left or right.
@@ -94,9 +94,11 @@ static const CGFloat ChoosePersonButtonVerticalPadding = 20.f;
     // after it is swiped (this behavior can be customized via the
     // MDCSwipeOptions class). Since the front card view is gone, we
     // move the back card to the front, and create a new back card.
+	self.previousCardView = self.frontCardView;
     self.frontCardView = self.backCardView;
-    if ((self.backCardView = [self popPersonViewWithFrame:[self backCardViewFrame]])) {
+	if ((self.backCardView = [self popPersonViewWithFrame:[self backCardViewFrame] frontView:self.previousCardView])) {
         // Fade the back card into view.
+		NSLog(@"fade");
         self.backCardView.alpha = 0.f;
         [self.view insertSubview:self.backCardView belowSubview:self.frontCardView];
         [UIView animateWithDuration:0.5
@@ -106,6 +108,10 @@ static const CGFloat ChoosePersonButtonVerticalPadding = 20.f;
                              self.backCardView.alpha = 1.f;
                          } completion:nil];
     }
+	else
+		NSLog(@"not fade");
+	[self.view addSubview:self.previousCardView];
+	AntiARCRetain(self.previousCardView);
 }
 
 #pragma mark - Internal Methods
@@ -149,7 +155,7 @@ static const CGFloat ChoosePersonButtonVerticalPadding = 20.f;
     ];
 }
 
-- (ChoosePersonView *)popPersonViewWithFrame:(CGRect)frame {
+- (ChoosePersonView *)popPersonViewWithFrame:(CGRect)frame frontView:(UIView*)frontView {
     if ([self.people count] == 0) {
         return nil;
     }
@@ -161,12 +167,15 @@ static const CGFloat ChoosePersonButtonVerticalPadding = 20.f;
     MDCSwipeToChooseViewOptions *options = [MDCSwipeToChooseViewOptions new];
     options.delegate = self;
     options.threshold = 160.f;
+	options.previousView = frontView;
     options.onPan = ^(MDCPanState *state){
         CGRect frame = [self backCardViewFrame];
-        self.backCardView.frame = CGRectMake(frame.origin.x,
-                                             frame.origin.y - (state.thresholdRatio * 10.f),
-                                             CGRectGetWidth(frame),
-                                             CGRectGetHeight(frame));
+		if (state.direction == MDCSwipeDirectionLeft)
+			self.backCardView.frame = CGRectMake(frame.origin.x,
+												 frame.origin.y - (state.thresholdRatio * 10.f),
+												 CGRectGetWidth(frame),
+												 CGRectGetHeight(frame));
+		//	else if (state.direction == MDCSwipeDirectionRight) self.previousCardView.frame = frame;
     };
 
     // Create a personView with the top person in the people array, then pop
