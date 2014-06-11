@@ -107,6 +107,8 @@ typedef void (^MDCSwipeToChooseOnChosenBlock)(MDCSwipeResult *state);
  */
 @property (nonatomic) BOOL isPreviousShown;
 @property (nonatomic) BOOL isViewLocked;
+@property (nonatomic) BOOL isLast;
+@property (nonatomic) CGSize size;
 @property (nonatomic) CFAbsoluteTime timestamp;
 
 /*!

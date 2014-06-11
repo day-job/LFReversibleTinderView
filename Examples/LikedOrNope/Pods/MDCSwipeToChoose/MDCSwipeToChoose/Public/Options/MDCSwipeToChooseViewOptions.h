@@ -92,4 +92,10 @@
  */
 @property (nonatomic, strong) UIView* previousView;
 
+/*!
+ * TODO: options may not be the best place for these instance variables.
+ */
+@property (nonatomic) BOOL isLast;
+@property (nonatomic) CGSize size;
+
 @end

@@ -34,7 +34,6 @@ static CGFloat const MDCSwipeToChooseViewTopPadding = 20.f;
 static CGFloat const MDCSwipeToChooseViewLabelWidth = 65.f;
 
 @interface MDCSwipeToChooseView ()
-@property (nonatomic, strong) MDCSwipeToChooseViewOptions *options;
 @end
 
 @implementation MDCSwipeToChooseView
@@ -103,7 +102,9 @@ static CGFloat const MDCSwipeToChooseViewLabelWidth = 65.f;
     MDCSwipeOptions *options = [MDCSwipeOptions new];
     options.delegate = self.options.delegate;
     options.threshold = self.options.threshold;
+    options.isLast = self.options.isLast;
     options.previousView = self.options.previousView;
+    options.size = self.options.size;
     options.isPreviousShown = NO;
 
     __block UIView *likedImageView = self.likedView;

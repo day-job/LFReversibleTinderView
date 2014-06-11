@@ -28,6 +28,9 @@
 #define AntiARCRetain(...) void *retainedThing = (__bridge_retained void *)__VA_ARGS__; retainedThing = retainedThing
 
 @interface ChoosePersonViewController : UIViewController <MDCSwipeToChooseDelegate>
+{
+	NSMutableArray*	views;
+}
 
 @property (nonatomic, strong) Person *currentPerson;
 @property (nonatomic, strong) ChoosePersonView *frontCardView;

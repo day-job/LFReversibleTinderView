@@ -26,12 +26,176 @@
 #import "Person.h"
 #import <MDCSwipeToChoose/MDCSwipeToChoose.h>
 
-static const CGFloat ChoosePersonButtonHorizontalPadding = 80.f;
-static const CGFloat ChoosePersonButtonVerticalPadding = 20.f;
+#define LFSwipeSubview	MDCSwipeToChooseView
+
+@interface LFSwipeView: UIView
+@property (nonatomic, strong) id				delegate;
+@property (nonatomic, strong) NSMutableArray*	swipe_views;	// contains LFSwipeSubview
+@end
+
+@implementation LFSwipeView
+//	TODO: other than setter, add more messages to modify swipe_views
+- (id)initWithFrame:(CGRect)frame
+{
+	self = [super initWithFrame:frame];
+	if (self)
+	{
+		self.swipe_views = [NSMutableArray new];
+		//self.userInteractionEnabled = YES;
+		//self.backgroundColor = [UIColor blueColor];
+		self.clipsToBounds = NO;
+	}
+	return self;
+}
+- (void)setSwipe_views:(NSArray*)views
+{
+	[self.swipe_views setArray:views];
+	srandomdev();
+	for (int i = 0; i < views.count; i++)
+	{
+		LFSwipeSubview* view = views[i];
+		LFSwipeSubview* view_previous = nil;
+		if (i > 0)
+			view_previous = views[i - 1];
+
+		MDCSwipeToChooseViewOptions *options = [MDCSwipeToChooseViewOptions new];
+		options.delegate = self.delegate;
+		options.threshold = 160.f;
+		options.previousView = view_previous;
+		options.isLast = (i == (views.count - 1)) ? YES : NO;
+		options.size = CGSizeMake(view.frame.size.width, view.frame.size.height);
+
+		//	rotate
+		float f = (float)random() / (float)RAND_MAX;
+		f = f / 5.0 - 0.1;
+		view.frame = CGRectMake( (self.frame.size.width - view.frame.size.width) / 2,
+				(self.frame.size.height - view.frame.size.height) / 2,
+				view.frame.size.width,
+				view.frame.size.height);
+		view.transform = CGAffineTransformMakeRotation(f);
+		view.options = options;
+		[view setupSwipeToChoose];
+
+		if (view_previous)
+			[self insertSubview:view belowSubview:view_previous];
+		else
+			[self addSubview:view];
+	}
+}
+@end
+
 
 @interface ChoosePersonViewController ()
 @property (nonatomic, strong) NSMutableArray *people;
 @end
+
+#if 1
+
+@implementation ChoosePersonViewController
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+		views = [[NSMutableArray alloc] init];
+        _people = [[self defaultPeople] mutableCopy];
+    }
+    return self;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+
+	//	set up button
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    UIImage *image = [UIImage imageNamed:@"liked"];
+    button.frame = CGRectMake(140, 400, image.size.width, image.size.height);
+    [button setImage:image forState:UIControlStateNormal];
+    [button setTintColor:[UIColor colorWithRed:29.f/255.f
+                                         green:245.f/255.f
+                                          blue:106.f/255.f
+                                         alpha:1.f]];
+    [button addTarget:self action:@selector(action_reload) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:button];
+
+	//	set up views
+	for (int i = 0; i < 4; i++)
+	{
+		ChoosePersonView* view = [[ChoosePersonView alloc] 
+			initWithFrame:CGRectMake(0, 0, 280, 360) person:self.people[i] options:nil];
+		[views addObject:view];
+	}
+
+	//	set up swipe view
+	LFSwipeView* view_swipe = [[LFSwipeView alloc] initWithFrame:CGRectMake(0, 60, 320, 320)];
+	view_swipe.delegate = self;
+	view_swipe.swipe_views = views;
+	[self.view addSubview:view_swipe];
+
+	self.view.userInteractionEnabled = YES;
+}
+
+- (void)action_reload {
+    //[self.frontCardView mdc_swipe:MDCSwipeDirectionRight];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wundeclared-selector"
+	[[[UIApplication sharedApplication] delegate] performSelector:@selector(setController)];
+#pragma clang diagnostic pop
+}
+
+#pragma mark delegate
+
+- (void)viewDidSwipeCancel:(UIView*)view
+{
+	NSLog(@"cancelled");
+}
+
+- (void)viewDidSwipePrevious:(UIView*)view
+{
+	NSLog(@"swiped previous");
+}
+
+- (void)viewDidSwipeNext:(UIView*)view
+{
+	NSLog(@"swiped next");
+}
+
+#pragma mark data
+
+- (NSArray *)defaultPeople {
+    return @[
+        [[Person alloc] initWithName:@"Finn"
+                               image:[UIImage imageNamed:@"finn"]
+                                 age:15
+               numberOfSharedFriends:3
+             numberOfSharedInterests:2
+                      numberOfPhotos:1],
+        [[Person alloc] initWithName:@"Jake"
+                               image:[UIImage imageNamed:@"jake"]
+                                 age:28
+               numberOfSharedFriends:2
+             numberOfSharedInterests:6
+                      numberOfPhotos:8],
+        [[Person alloc] initWithName:@"Fiona"
+                               image:[UIImage imageNamed:@"fiona"]
+                                 age:14
+               numberOfSharedFriends:1
+             numberOfSharedInterests:3
+                      numberOfPhotos:5],
+        [[Person alloc] initWithName:@"P. Gumball"
+                               image:[UIImage imageNamed:@"prince"]
+                                 age:18
+               numberOfSharedFriends:1
+             numberOfSharedInterests:1
+                      numberOfPhotos:2],
+    ];
+}
+
+@end
+
+#else
+
+static const CGFloat ChoosePersonButtonHorizontalPadding = 80.f;
+static const CGFloat ChoosePersonButtonVerticalPadding = 20.f;
 
 @implementation ChoosePersonViewController
 
@@ -40,6 +204,7 @@ static const CGFloat ChoosePersonButtonVerticalPadding = 20.f;
 - (instancetype)init {
     self = [super init];
     if (self) {
+		views = [[NSMutableArray alloc] init];
         // This view controller maintains a list of ChoosePersonView
         // instances to display.
         _people = [[self defaultPeople] mutableCopy];
@@ -52,6 +217,97 @@ static const CGFloat ChoosePersonButtonVerticalPadding = 20.f;
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+	//	test
+#if 0
+	for (int i = 0; i < 4; i++)
+	{
+		ChoosePersonView* view = [[ChoosePersonView alloc] 
+			initWithFrame:CGRectMake(20, 20, 280, 280) person:self.people[i] options:nil];
+		[views addObject:view];
+	}
+	LFSwipeView* view_swipe = [[LFSwipeView alloc] initWithFrame:CGRectMake(0, 220, 320, 320)];
+	view_swipe.delegate = self;
+	view_swipe.subviews = views;
+	[self.view addSubview:view_swipe];
+#endif
+
+	//	working code
+#if 1
+	srandomdev();
+	int count = 4;
+	for (int i = 0; i < count; i++)
+	{
+#if 0
+		ChoosePersonView* view_previous = nil;
+		if (i > 0)
+			view_previous = views[i - 1];
+
+		//	ChoosePersonView* view = [self alloc_view_frame: index:i];
+		MDCSwipeToChooseViewOptions *options = [MDCSwipeToChooseViewOptions new];
+		options.delegate = self;
+		options.threshold = 160.f;
+		options.previousView = view_previous;
+		options.isLast = (i == 3) ? YES : NO;
+		options.size = CGSizeMake(280, 280);
+		options.onPan = ^(MDCPanState *state) {
+			CGRect frame = [self backCardViewFrame];
+			if (state.direction == MDCSwipeDirectionLeft)
+			{
+				self.backCardView.frame = CGRectMake(frame.origin.x,
+													 frame.origin.y - (state.thresholdRatio * 10.f),
+													 CGRectGetWidth(frame),
+													 CGRectGetHeight(frame));
+			}
+		};
+#endif
+
+		CGRect frame = CGRectMake(20, 60, 280, 280);
+		ChoosePersonView *view = [[ChoosePersonView alloc] 
+			initWithFrame:frame person:self.people[i] options:nil];
+
+		[views addObject:view];
+
+#if 0
+		//	rotate
+		float f = (float)random() / (float)RAND_MAX;
+		f = f / 5.0 - 0.1;
+		view.transform = CGAffineTransformMakeRotation(f);
+
+		if (view_previous)
+			[self.view insertSubview:view belowSubview:view_previous];
+		else
+			[self.view addSubview:view];
+#endif
+
+#if 1
+		//LFSwipeSubview* view = views[i];
+		LFSwipeSubview* view_previous = nil;
+		if (i > 0)
+			view_previous = views[i - 1];
+
+		MDCSwipeToChooseViewOptions *options = [MDCSwipeToChooseViewOptions new];
+		options.delegate = self;
+		options.threshold = 160.f;
+		options.previousView = view_previous;
+		options.isLast = (i == (count - 1)) ? YES : NO;
+		options.size = CGSizeMake(280, 280);
+
+		//	rotate
+		float f = (float)random() / (float)RAND_MAX;
+		f = f / 5.0 - 0.1;
+		view.transform = CGAffineTransformMakeRotation(f);
+		view.options = options;
+		[view setupSwipeToChoose];
+
+		if (view_previous)
+			[self.view insertSubview:view belowSubview:view_previous];
+		else
+			[self.view addSubview:view];
+		//	NSLog(@"%i view %i - %i", i, options.isLast, view);
+#endif
+	}
+#endif
+#if 0
     // Display the first ChoosePersonView in front. Users can swipe to indicate
     // whether they like or dislike the person displayed.
 	self.frontCardView = [self popPersonViewWithFrame:[self frontCardViewFrame] frontView:nil];
@@ -62,7 +318,7 @@ static const CGFloat ChoosePersonButtonVerticalPadding = 20.f;
     // back views after each user swipe.
 	self.backCardView = [self popPersonViewWithFrame:[self backCardViewFrame] frontView:self.frontCardView];
     [self.view insertSubview:self.backCardView belowSubview:self.frontCardView];
-
+#endif
     // Add buttons to programmatically swipe the view left or right.
     // See the `nopeFrontCardView` and `likeFrontCardView` methods.
     [self constructNopeButton];
@@ -74,6 +330,21 @@ static const CGFloat ChoosePersonButtonVerticalPadding = 20.f;
 }
 
 #pragma mark - MDCSwipeToChooseDelegate Protocol Methods
+
+- (void)viewDidSwipeCancel:(UIView*)view
+{
+	NSLog(@"cancelled");
+}
+
+- (void)viewDidSwipePrevious:(UIView*)view
+{
+	NSLog(@"swiped previous");
+}
+
+- (void)viewDidSwipeNext:(UIView*)view
+{
+	NSLog(@"swiped next");
+}
 
 // This is called when a user didn't fully swipe left or right.
 - (void)viewDidCancelSwipe:(UIView *)view {
@@ -90,15 +361,15 @@ static const CGFloat ChoosePersonButtonVerticalPadding = 20.f;
         NSLog(@"You liked %@.", self.currentPerson.name);
     }
 
+#if 0
     // MDCSwipeToChooseView removes the view from the view hierarchy
     // after it is swiped (this behavior can be customized via the
     // MDCSwipeOptions class). Since the front card view is gone, we
     // move the back card to the front, and create a new back card.
 	self.previousCardView = self.frontCardView;
     self.frontCardView = self.backCardView;
-	if ((self.backCardView = [self popPersonViewWithFrame:[self backCardViewFrame] frontView:self.previousCardView])) {
+	if ((self.backCardView = [self popPersonViewWithFrame:[self backCardViewFrame] frontView:self.frontCardView])) {
         // Fade the back card into view.
-		NSLog(@"fade");
         self.backCardView.alpha = 0.f;
         [self.view insertSubview:self.backCardView belowSubview:self.frontCardView];
         [UIView animateWithDuration:0.5
@@ -108,10 +379,9 @@ static const CGFloat ChoosePersonButtonVerticalPadding = 20.f;
                              self.backCardView.alpha = 1.f;
                          } completion:nil];
     }
-	else
-		NSLog(@"not fade");
 	[self.view addSubview:self.previousCardView];
-	AntiARCRetain(self.previousCardView);
+	//AntiARCRetain(self.previousCardView);
+#endif
 }
 
 #pragma mark - Internal Methods
@@ -153,6 +423,35 @@ static const CGFloat ChoosePersonButtonVerticalPadding = 20.f;
              numberOfSharedInterests:1
                       numberOfPhotos:2],
     ];
+}
+
+- (ChoosePersonView*)alloc_view_frame:(CGRect)frame index:(int)index
+{
+	ChoosePersonView* previousView = nil;
+	if (index > 0)
+		previousView = views[index - 1];
+
+    MDCSwipeToChooseViewOptions *options = [MDCSwipeToChooseViewOptions new];
+    options.delegate = self;
+    options.threshold = 160.f;
+	options.previousView = previousView;
+	options.isLast = (index == 3) ? YES : NO;
+	options.size = CGSizeMake(280, 280);
+    options.onPan = ^(MDCPanState *state) {
+        CGRect frame = [self backCardViewFrame];
+		if (state.direction == MDCSwipeDirectionLeft)
+		{
+			self.backCardView.frame = CGRectMake(frame.origin.x,
+												 frame.origin.y - (state.thresholdRatio * 10.f),
+												 CGRectGetWidth(frame),
+												 CGRectGetHeight(frame));
+		}
+    };
+
+    ChoosePersonView *personView = [[ChoosePersonView alloc] 
+		initWithFrame:frame person:self.people[index] options:options];
+
+    return personView;
 }
 
 - (ChoosePersonView *)popPersonViewWithFrame:(CGRect)frame frontView:(UIView*)frontView {
@@ -212,7 +511,7 @@ static const CGFloat ChoosePersonButtonVerticalPadding = 20.f;
     UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     UIImage *image = [UIImage imageNamed:@"nope"];
     button.frame = CGRectMake(ChoosePersonButtonHorizontalPadding,
-                              CGRectGetMaxY(self.backCardView.frame) + ChoosePersonButtonVerticalPadding,
+                              CGRectGetMaxY([views[0] frame]) + ChoosePersonButtonVerticalPadding,
                               image.size.width,
                               image.size.height);
     [button setImage:image forState:UIControlStateNormal];
@@ -231,7 +530,7 @@ static const CGFloat ChoosePersonButtonVerticalPadding = 20.f;
     UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     UIImage *image = [UIImage imageNamed:@"liked"];
     button.frame = CGRectMake(CGRectGetMaxX(self.view.frame) - image.size.width - ChoosePersonButtonHorizontalPadding,
-                              CGRectGetMaxY(self.backCardView.frame) + ChoosePersonButtonVerticalPadding,
+                              CGRectGetMaxY([views[0] frame]) + ChoosePersonButtonVerticalPadding,
                               image.size.width,
                               image.size.height);
     [button setImage:image forState:UIControlStateNormal];
@@ -254,7 +553,12 @@ static const CGFloat ChoosePersonButtonVerticalPadding = 20.f;
 
 // Programmatically "likes" the front card view.
 - (void)likeFrontCardView {
-    [self.frontCardView mdc_swipe:MDCSwipeDirectionRight];
+    //[self.frontCardView mdc_swipe:MDCSwipeDirectionRight];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wundeclared-selector"
+	[[[UIApplication sharedApplication] delegate] performSelector:@selector(setController)];
+#pragma clang diagnostic pop
 }
 
 @end
+#endif

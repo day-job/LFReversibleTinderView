@@ -44,6 +44,8 @@
 		_previousView = nil;
 		_isPreviousShown = NO;
 		_isViewLocked = NO;
+		_isLast = NO;
+		_size = CGSizeMake(280, 280);
     }
     return self;
 }
@@ -63,7 +65,7 @@
                              state.view.frame = destination;
                          } completion:^(BOOL finished) {
                              if (finished) {
-                                 [state.view removeFromSuperview];
+                                 //[state.view removeFromSuperview];
                                  state.onCompletion();
                              }
                          }];

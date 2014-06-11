@@ -107,6 +107,14 @@ const void * const MDCViewStateKey = &MDCViewStateKey;
     [[UIPanGestureRecognizer alloc] initWithTarget:self
                                             action:action];
     [self addGestureRecognizer:panGestureRecognizer];
+
+	//self.userInteractionEnabled = YES;
+	//self.clipsToBounds = YES;
+	//NSLog(@"option is last: %i\n%@", self.mdc_options.isLast, self);
+}
+
+-(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
 }
 
 #pragma mark Translation
@@ -123,7 +131,11 @@ const void * const MDCViewStateKey = &MDCViewStateKey;
         }
         case MDCSwipeDirectionNone:
             [self mdc_returnToOriginalCenter];
-            [self mdc_executeOnPanBlockForTranslation:CGPointZero];
+			[self mdc_executeOnPanBlockForTranslation:CGPointZero];
+			id<MDCSwipeToChooseDelegate> delegate = self.mdc_options.delegate;
+			if ([delegate respondsToSelector:@selector(viewDidSwipeCancel:)]) {
+				[delegate viewDidSwipeCancel:self];
+			}
             break;
     }
 }
@@ -160,6 +172,9 @@ const void * const MDCViewStateKey = &MDCViewStateKey;
     state.onCompletion = ^{
         if ([delegate respondsToSelector:@selector(view:wasChosenWithDirection:)]) {
             [delegate view:self wasChosenWithDirection:direction];
+        }
+        if ([delegate respondsToSelector:@selector(viewDidSwipeNext:)]) {
+            [delegate viewDidSwipeNext:self];
         }
     };
     self.mdc_options.onChosen(state);
@@ -246,13 +261,22 @@ const void * const MDCViewStateKey = &MDCViewStateKey;
 		else
 		{
 			CFAbsoluteTime interval = 0.3 - (CFAbsoluteTimeGetCurrent() - self.mdc_options.timestamp);
-			NSLog(@"xx %f", interval);
 			if (interval < 0)
 				interval = 0;
 			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, interval * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
 				[self.mdc_options.previousView mdc_returnToOriginalCenter];
 				[self.mdc_options.previousView mdc_executeOnPanBlockForTranslation:CGPointZero];
+
+				float f = (float)random() / (float)RAND_MAX;
+				f = f / 5.0 - 0.1;
+				self.mdc_options.previousView.transform = CGAffineTransformMakeRotation(f);
 			});
+			self.mdc_options.isPreviousShown = NO;
+
+			id<MDCSwipeToChooseDelegate> delegate = self.mdc_options.delegate;
+			if ([delegate respondsToSelector:@selector(viewDidSwipePrevious:)]) {
+				[delegate viewDidSwipePrevious:self];
+			}
 		}
 		//	end
     } else {
@@ -262,10 +286,14 @@ const void * const MDCViewStateKey = &MDCViewStateKey;
 		//	TODO begin
 		if ((translation.x < 0) && (self.mdc_options.isPreviousShown == NO))
 		{
-			self.mdc_options.isViewLocked = YES;
-			view.center = MDCCGPointAdd(self.mdc_viewState.originalCenter, translation);
-			[view mdc_rotateForTranslation:translation
-						 rotationDirection:self.mdc_viewState.rotationDirection];
+			//NSLog(@"xx is last: %i - %i", self.mdc_options.isLast, self);
+			if (!self.mdc_options.isLast)
+			{
+				self.mdc_options.isViewLocked = YES;
+				view.center = MDCCGPointAdd(self.mdc_viewState.originalCenter, translation);
+				[view mdc_rotateForTranslation:translation
+							 rotationDirection:self.mdc_viewState.rotationDirection];
+			}
 		}
 		else if (self.mdc_options.previousView && (!self.mdc_options.isViewLocked || self.mdc_options.isPreviousShown)) 
 		{
@@ -278,13 +306,16 @@ const void * const MDCViewStateKey = &MDCViewStateKey;
 					self.mdc_options.previousView.center = MDCCGPointAdd(self.mdc_viewState.originalCenter, translation);
 					[self.mdc_options.previousView mdc_rotateForTranslation:translation
 								 rotationDirection:self.mdc_viewState.rotationDirection];
+				} completion:^(BOOL done) {
 				}];
 				//	move this into block to make a different visual effect
 				self.mdc_options.previousView.frame = CGRectMake(
 						self.mdc_options.previousView.frame.origin.x,
 						self.mdc_options.previousView.frame.origin.y,
-						self.frame.size.width,
-						self.frame.size.height);
+						self.mdc_options.size.width,
+						self.mdc_options.size.height);
+						//self.frame.size.width, self.frame.size.height);
+				self.mdc_options.previousView.transform = CGAffineTransformIdentity;
 			}
 			else
 			{
