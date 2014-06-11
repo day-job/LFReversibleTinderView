@@ -74,7 +74,7 @@
 
 - (void)viewDidSwipeCancel:(UIView*)view
 {
-	NSLog(@"current item: %i/%i", self.index + 1, self.count);
+	//NSLog(@"current item: %i/%i", self.index + 1, self.count);
 }
 
 - (void)viewDidSwipePrevious:(UIView*)view
