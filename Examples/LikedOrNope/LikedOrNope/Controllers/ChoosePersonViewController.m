@@ -26,40 +26,56 @@
 #import "Person.h"
 #import <MDCSwipeToChoose/MDCSwipeToChoose.h>
 
-#define LFSwipeSubview	MDCSwipeToChooseView
-
-@interface LFSwipeView: UIView
-@property (nonatomic, strong) id				delegate;
-@property (nonatomic, strong) NSMutableArray*	swipe_views;	// contains LFSwipeSubview
+#if 0
+@interface LFReversibleTinderSubview: MDCSwipeToChooseView
+@end
+@implementation LFReversibleTinderSubview
 @end
 
-@implementation LFSwipeView
-//	TODO: other than setter, add more messages to modify swipe_views
+@interface LFReversibleTinderView: UIView <MDCSwipeToChooseDelegate>
+@property (nonatomic) int index;
+@property (nonatomic) int count;
+// contains LFReversibleTinderSubview
+@property (nonatomic, strong) NSArray*	swipe_views;	
+//@property (nonatomic, strong) id		delegate;
+@end
+
+@implementation LFReversibleTinderView
+
+#if 0
 - (id)initWithFrame:(CGRect)frame
 {
 	self = [super initWithFrame:frame];
 	if (self)
 	{
 		self.swipe_views = [NSMutableArray new];
+		self.clipsToBounds = NO;
 		//self.userInteractionEnabled = YES;
 		//self.backgroundColor = [UIColor blueColor];
-		self.clipsToBounds = NO;
 	}
 	return self;
 }
+#endif
+
 - (void)setSwipe_views:(NSArray*)views
 {
-	[self.swipe_views setArray:views];
+	self.clipsToBounds = NO;
+	//self.swipe_views = views;
+	//[self.swipe_views setArray:views];
+
+	self.index = 0;
+	self.count = views.count;
 	srandomdev();
 	for (int i = 0; i < views.count; i++)
 	{
-		LFSwipeSubview* view = views[i];
-		LFSwipeSubview* view_previous = nil;
+		LFReversibleTinderSubview* view = views[i];
+		LFReversibleTinderSubview* view_previous = nil;
 		if (i > 0)
 			view_previous = views[i - 1];
 
 		MDCSwipeToChooseViewOptions *options = [MDCSwipeToChooseViewOptions new];
-		options.delegate = self.delegate;
+		//options.delegate = self.delegate;
+		options.delegate = self;
 		options.threshold = 160.f;
 		options.previousView = view_previous;
 		options.isLast = (i == (views.count - 1)) ? YES : NO;
@@ -82,7 +98,32 @@
 			[self addSubview:view];
 	}
 }
+
+- (NSArray*)swipe_views
+{
+	NSLog(@"DEBUG LFReversibleTinderView: getter doesn't work for swipe_views, please retain your own copy");
+	return nil;
+}
+
+#pragma mark delegate
+
+- (void)viewDidSwipeCancel:(UIView*)view
+{
+	NSLog(@"current item: %i/%i", self.index + 1, self.count);
+}
+
+- (void)viewDidSwipePrevious:(UIView*)view
+{
+	self.index--;
+}
+
+- (void)viewDidSwipeNext:(UIView*)view
+{
+	self.index++;
+}
+
 @end
+#endif
 
 
 @interface ChoosePersonViewController ()
@@ -126,12 +167,12 @@
 	}
 
 	//	set up swipe view
-	LFSwipeView* view_swipe = [[LFSwipeView alloc] initWithFrame:CGRectMake(0, 60, 320, 320)];
-	view_swipe.delegate = self;
+	LFReversibleTinderView* view_swipe = [[LFReversibleTinderView alloc] initWithFrame:CGRectMake(0, 60, 320, 320)];
 	view_swipe.swipe_views = views;
 	[self.view addSubview:view_swipe];
-
-	self.view.userInteractionEnabled = YES;
+	NSLog(@"dummy: %@", view_swipe.swipe_views);
+	//view_swipe.delegate = self;
+	//self.view.userInteractionEnabled = YES;
 }
 
 - (void)action_reload {
@@ -225,7 +266,7 @@ static const CGFloat ChoosePersonButtonVerticalPadding = 20.f;
 			initWithFrame:CGRectMake(20, 20, 280, 280) person:self.people[i] options:nil];
 		[views addObject:view];
 	}
-	LFSwipeView* view_swipe = [[LFSwipeView alloc] initWithFrame:CGRectMake(0, 220, 320, 320)];
+	LFReversibleTinderView* view_swipe = [[LFReversibleTinderView alloc] initWithFrame:CGRectMake(0, 220, 320, 320)];
 	view_swipe.delegate = self;
 	view_swipe.subviews = views;
 	[self.view addSubview:view_swipe];
@@ -280,8 +321,8 @@ static const CGFloat ChoosePersonButtonVerticalPadding = 20.f;
 #endif
 
 #if 1
-		//LFSwipeSubview* view = views[i];
-		LFSwipeSubview* view_previous = nil;
+		//LFReversibleTinderSubview* view = views[i];
+		LFReversibleTinderSubview* view_previous = nil;
 		if (i > 0)
 			view_previous = views[i - 1];
 

@@ -24,6 +24,7 @@
 
 #import <UIKit/UIKit.h>
 #import "ChoosePersonView.h"
+#import "LFReversibleTinderView.h"
 
 #define AntiARCRetain(...) void *retainedThing = (__bridge_retained void *)__VA_ARGS__; retainedThing = retainedThing
 
