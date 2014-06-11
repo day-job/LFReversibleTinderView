@@ -39,6 +39,9 @@
         _nopeRotationAngle = 15.f;
 
         _threshold = 100.f;
+		_previousView = nil;
+		_isLast = NO;
+		_size = CGSizeMake(280, 280);
     }
     return self;
 }

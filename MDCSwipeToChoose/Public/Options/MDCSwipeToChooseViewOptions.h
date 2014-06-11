@@ -87,4 +87,15 @@
  */
 @property (nonatomic, copy) MDCSwipeToChooseOnPanBlock onPan;
 
+/*!
+ * The view that is used for the swipe-right-to-restore feature.
+ */
+@property (nonatomic, strong) UIView* previousView;
+
+/*!
+ * TODO: options may not be the best place for these instance variables.
+ */
+@property (nonatomic) BOOL isLast;
+@property (nonatomic) CGSize size;
+
 @end

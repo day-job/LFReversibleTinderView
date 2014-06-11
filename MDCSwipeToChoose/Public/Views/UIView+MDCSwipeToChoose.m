@@ -107,6 +107,14 @@ const void * const MDCViewStateKey = &MDCViewStateKey;
     [[UIPanGestureRecognizer alloc] initWithTarget:self
                                             action:action];
     [self addGestureRecognizer:panGestureRecognizer];
+
+	//self.userInteractionEnabled = YES;
+	//self.clipsToBounds = YES;
+	//NSLog(@"option is last: %i\n%@", self.mdc_options.isLast, self);
+}
+
+-(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
 }
 
 #pragma mark Translation
@@ -123,7 +131,11 @@ const void * const MDCViewStateKey = &MDCViewStateKey;
         }
         case MDCSwipeDirectionNone:
             [self mdc_returnToOriginalCenter];
-            [self mdc_executeOnPanBlockForTranslation:CGPointZero];
+			[self mdc_executeOnPanBlockForTranslation:CGPointZero];
+			id<MDCSwipeToChooseDelegate> delegate = self.mdc_options.delegate;
+			if ([delegate respondsToSelector:@selector(viewDidSwipeCancel:)]) {
+				[delegate viewDidSwipeCancel:self];
+			}
             break;
     }
 }
@@ -160,6 +172,9 @@ const void * const MDCViewStateKey = &MDCViewStateKey;
     state.onCompletion = ^{
         if ([delegate respondsToSelector:@selector(view:wasChosenWithDirection:)]) {
             [delegate view:self wasChosenWithDirection:direction];
+        }
+        if ([delegate respondsToSelector:@selector(viewDidSwipeNext:)]) {
+            [delegate viewDidSwipeNext:self];
         }
     };
     self.mdc_options.onChosen(state);
@@ -229,6 +244,7 @@ const void * const MDCViewStateKey = &MDCViewStateKey;
 
     if (panGestureRecognizer.state == UIGestureRecognizerStateBegan) {
         self.mdc_viewState.originalCenter = view.center;
+		self.mdc_options.isViewLocked = NO;
 
         // If the pan gesture originated at the top half of the view, rotate the view
         // away from the center. Otherwise, rotate towards the center.
@@ -239,14 +255,76 @@ const void * const MDCViewStateKey = &MDCViewStateKey;
         }
     } else if (panGestureRecognizer.state == UIGestureRecognizerStateEnded) {
         // Either move the view back to its original position or move it off screen.
-        [self mdc_finalizePosition];
+		// TODO begin
+		if (self.mdc_options.isPreviousShown == NO)
+			[self mdc_finalizePosition];
+		else
+		{
+			CFAbsoluteTime interval = 0.3 - (CFAbsoluteTimeGetCurrent() - self.mdc_options.timestamp);
+			if (interval < 0)
+				interval = 0;
+			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, interval * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+				[self.mdc_options.previousView mdc_returnToOriginalCenter];
+				[self.mdc_options.previousView mdc_executeOnPanBlockForTranslation:CGPointZero];
+
+				float f = (float)random() / (float)RAND_MAX;
+				f = f / 5.0 - 0.1;
+				self.mdc_options.previousView.transform = CGAffineTransformMakeRotation(f);
+			});
+			self.mdc_options.isPreviousShown = NO;
+
+			id<MDCSwipeToChooseDelegate> delegate = self.mdc_options.delegate;
+			if ([delegate respondsToSelector:@selector(viewDidSwipePrevious:)]) {
+				[delegate viewDidSwipePrevious:self];
+			}
+		}
+		//	end
     } else {
         // Update the position and transform. Then, notify any listeners of
         // the updates via the pan block.
         CGPoint translation = [panGestureRecognizer translationInView:view];
-        view.center = MDCCGPointAdd(self.mdc_viewState.originalCenter, translation);
-        [self mdc_rotateForTranslation:translation
-                     rotationDirection:self.mdc_viewState.rotationDirection];
+		//	TODO begin
+		if ((translation.x < 0) && (self.mdc_options.isPreviousShown == NO))
+		{
+			//NSLog(@"xx is last: %i - %i", self.mdc_options.isLast, self);
+			if (!self.mdc_options.isLast)
+			{
+				self.mdc_options.isViewLocked = YES;
+				view.center = MDCCGPointAdd(self.mdc_viewState.originalCenter, translation);
+				[view mdc_rotateForTranslation:translation
+							 rotationDirection:self.mdc_viewState.rotationDirection];
+			}
+		}
+		else if (self.mdc_options.previousView && (!self.mdc_options.isViewLocked || self.mdc_options.isPreviousShown)) 
+		{
+			if (self.mdc_options.isPreviousShown == NO)
+			{
+				self.mdc_options.timestamp = CFAbsoluteTimeGetCurrent();
+				self.mdc_options.isPreviousShown = YES;
+				self.mdc_options.isViewLocked = YES;
+				[UIView animateWithDuration:0.3 animations:^() {
+					self.mdc_options.previousView.center = MDCCGPointAdd(self.mdc_viewState.originalCenter, translation);
+					[self.mdc_options.previousView mdc_rotateForTranslation:translation
+								 rotationDirection:self.mdc_viewState.rotationDirection];
+				} completion:^(BOOL done) {
+				}];
+				//	move this into block to make a different visual effect
+				self.mdc_options.previousView.frame = CGRectMake(
+						self.mdc_options.previousView.frame.origin.x,
+						self.mdc_options.previousView.frame.origin.y,
+						self.mdc_options.size.width,
+						self.mdc_options.size.height);
+						//self.frame.size.width, self.frame.size.height);
+				self.mdc_options.previousView.transform = CGAffineTransformIdentity;
+			}
+			else
+			{
+				self.mdc_options.previousView.center = MDCCGPointAdd(self.mdc_viewState.originalCenter, translation);
+				[self.mdc_options.previousView mdc_rotateForTranslation:translation
+							 rotationDirection:self.mdc_viewState.rotationDirection];
+			}
+		}
+		//	end
         [self mdc_executeOnPanBlockForTranslation:translation];
     }
 }

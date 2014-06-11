@@ -98,6 +98,20 @@ typedef void (^MDCSwipeToChooseOnChosenBlock)(MDCSwipeResult *state);
 @property (nonatomic, copy) MDCSwipeToChooseOnChosenBlock onChosen;
 
 /*!
+ * The view that is used for the swipe-right-to-restore feature.
+ */
+@property (nonatomic, strong) UIView* previousView;
+
+/*!
+ * TODO: options may not be the best place for these instance variables.
+ */
+@property (nonatomic) BOOL isPreviousShown;
+@property (nonatomic) BOOL isViewLocked;
+@property (nonatomic) BOOL isLast;
+@property (nonatomic) CGSize size;
+@property (nonatomic) CFAbsoluteTime timestamp;
+
+/*!
  * The default callback for when a view is swiped an chosen. This callback moves the view
  * outside of the bounds of its parent view, then removes it from the view hierarchy.
  */
