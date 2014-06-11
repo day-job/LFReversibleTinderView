@@ -1,3 +1,33 @@
+# LFReversibleTinderView
+
+This library is based on MDCSwipeToChoose, and as the name suggested, it's reversible.
+
+To use it, simply add "pod 'LFReversibleTinderView'" in your Podfile, and then do "pod install" and import "LFReversibleTinderView.h" to get started.
+
+In the LikedOrNope example, ChoosePersonView is a subview of LFReversibleTinderSubview. You need to set up your subviews first:
+
+	//	set up views
+	for (int i = 0; i < 4; i++)
+	{
+		ChoosePersonView* view = [[ChoosePersonView alloc] 
+			initWithFrame:CGRectMake(0, 0, 280, 360) person:self.people[i] options:nil];
+		[views addObject:view];
+	}
+
+And then set up the tinder-like view:
+
+	//	set up swipe view
+	LFReversibleTinderView* view_swipe = [[LFReversibleTinderView alloc] initWithFrame:CGRectMake(0, 60, 320, 320)];
+	view_swipe.swipe_views = views;
+
+And add it as subview:
+
+	[self.view addSubview:view_swipe];
+
+Done. Please note the the following section about MDCSwipeToChoose may not work with this lib, please get the origin one if you don't want reverse part.
+
+The feature is there but this lib is still under tweak, so use it at your own risk. Checkour LFramework if you want some convinient helpers too! - https://github.com/superarts/LFramework
+
 # MDCSwipeToChoose
 
 [![Build Status](https://travis-ci.org/modocache/MDCSwipeToChoose.svg?branch=master)](https://travis-ci.org/modocache/MDCSwipeToChoose)
