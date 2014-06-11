@@ -23,7 +23,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <MDCSwipeToChoose/MDCSwipeToChoose.h>
+#import "LFReversibleTinderView.h"
+//#import <MDCSwipeToChoose/MDCSwipeToChoose.h>
 
 @class Person;
 

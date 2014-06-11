@@ -6,7 +6,7 @@ Pod::Spec.new do |s|
   s.license = 'MIT'
   s.author = { 'Leo' => 'leo@superarts.org' }
   s.social_media_url = 'https://twitter.com/superarts_org'
-  s.source = { :git => 'https://github.com/superarts/MDCSwipeToChoose.git', :tag => "v#{s.version}" }
+  s.source = { :git => 'https://github.com/superarts/MDCSwipeToChoose.git', :tag => "#{s.version}" }
   s.source_files = 'MDCSwipeToChoose/**/*.{h,m}'
   s.public_header_files = 'MDCSwipeToChoose/Public/**/*.{h,m}'
   s.requires_arc = true

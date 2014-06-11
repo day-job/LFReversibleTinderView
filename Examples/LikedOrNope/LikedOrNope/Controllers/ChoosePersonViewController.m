@@ -24,7 +24,7 @@
 
 #import "ChoosePersonViewController.h"
 #import "Person.h"
-#import <MDCSwipeToChoose/MDCSwipeToChoose.h>
+#import "MDCSwipeToChoose.h"
 
 #if 0
 @interface LFReversibleTinderSubview: MDCSwipeToChooseView
