@@ -113,10 +113,6 @@ const void * const MDCViewStateKey = &MDCViewStateKey;
 	//NSLog(@"option is last: %i\n%@", self.mdc_options.isLast, self);
 }
 
--(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
-{
-}
-
 #pragma mark Translation
 
 - (void)mdc_finalizePosition {
