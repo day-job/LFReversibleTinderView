@@ -7,7 +7,7 @@
 
 @implementation LFReversibleTinderView
 
-#if 0
+#if 1
 - (id)initWithFrame:(CGRect)frame
 {
 	self = [super initWithFrame:frame];
@@ -24,9 +24,10 @@
 
 - (void)setSwipe_views:(NSArray*)views
 {
-	self.clipsToBounds = NO;
-	//self.swipe_views = views;
+	//self.clipsToBounds = NO;
+	[swipe_views setArray:views];
 	//[self.swipe_views setArray:views];
+	[self.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
 
 	self.index = 0;
 	self.count = views.count;
@@ -66,8 +67,8 @@
 
 - (NSArray*)swipe_views
 {
-	NSLog(@"DEBUG LFReversibleTinderView: getter doesn't work for swipe_views, please retain your own copy");
-	return nil;
+	//	NSLog(@"DEBUG LFReversibleTinderView: getter doesn't work for swipe_views, please retain your own copy");
+	return swipe_views;
 }
 
 #pragma mark delegate
