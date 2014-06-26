@@ -13,7 +13,9 @@
 	self = [super initWithFrame:frame];
 	if (self)
 	{
-		self.swipe_views = [NSMutableArray new];
+		swipe_views = [NSMutableArray new];
+		self.block_previous = nil;
+		self.block_next = nil;
 		self.clipsToBounds = NO;
 		//self.userInteractionEnabled = YES;
 		//self.backgroundColor = [UIColor blueColor];
@@ -81,11 +83,15 @@
 - (void)viewDidSwipePrevious:(UIView*)view
 {
 	self.index--;
+	if (self.block_previous)
+		self.block_previous();
 }
 
 - (void)viewDidSwipeNext:(UIView*)view
 {
 	self.index++;
+	if (self.block_next)
+		self.block_next();
 }
 
 @end
