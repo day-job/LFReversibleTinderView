@@ -11,8 +11,8 @@ typedef void(^LFReversibleTinderViewBlockVoid)			(void);
 {
 	NSMutableArray*	swipe_views;
 }
-@property (nonatomic) int index;
-@property (nonatomic) int count;
+@property (nonatomic) NSUInteger index;
+@property (nonatomic) NSUInteger count;
 // contains LFReversibleTinderSubview
 @property (nonatomic, strong) NSMutableArray*	swipe_views;	
 @property (nonatomic, strong) LFReversibleTinderViewBlockVoid	block_previous;	
