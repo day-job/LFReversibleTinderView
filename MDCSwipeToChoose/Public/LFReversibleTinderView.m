@@ -46,7 +46,8 @@
 		options.delegate = self;
 		options.threshold = 160.f;
 		options.previousView = view_previous;
-		options.isLast = (i == (views.count - 1)) ? YES : NO;
+		//options.isLast = (i == (views.count - 1)) ? YES : NO;
+		options.isLast = NO;
 		options.size = CGSizeMake(view.frame.size.width, view.frame.size.height);
 
 		//	rotate
@@ -65,6 +66,24 @@
 		else
 			[self addSubview:view];
 	}
+	if (views.count > 0)
+	{
+		LFReversibleTinderSubview* view_previous = views[views.count - 1];
+		LFReversibleTinderSubview* view_last = [[LFReversibleTinderSubview alloc] initWithFrame:[views[0] frame]];
+		view_last.backgroundColor = [UIColor clearColor];
+
+		MDCSwipeToChooseViewOptions *options = [MDCSwipeToChooseViewOptions new];
+		options.delegate = self;
+		options.threshold = 160.f;
+		options.previousView = view_previous;
+		options.isLast = YES;
+		options.size = CGSizeMake(view_last.frame.size.width, view_last.frame.size.height);
+		view_last.options = options;
+		[view_last setupSwipeToChoose];
+
+		[self insertSubview:view_last belowSubview:view_previous];
+	}
+
 }
 
 - (NSArray*)swipe_views
