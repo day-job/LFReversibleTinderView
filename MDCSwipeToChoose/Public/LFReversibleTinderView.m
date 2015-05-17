@@ -113,4 +113,16 @@
 		self.block_next();
 }
 
+- (void)skip
+{
+    NSLog(@"skip");
+    if (self.index < swipe_views.count) {
+        LFReversibleTinderSubview* view = swipe_views[self.index];
+        [UIView animateWithDuration:0.3 animations:^{
+            view.frame = CGRectMake(view.frame.origin.x - [UIScreen mainScreen].bounds.size.width * 1.5, 0, view.frame.size.width, view.frame.size.height);
+            self.index++;
+        }];
+    }
+}
+
 @end

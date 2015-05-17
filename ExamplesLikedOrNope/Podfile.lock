@@ -1,0 +1,10 @@
+PODS:
+  - LFReversibleTinderView (HEAD based on 0.3.6)
+
+DEPENDENCIES:
+  - LFReversibleTinderView (HEAD)
+
+SPEC CHECKSUMS:
+  LFReversibleTinderView: 7a08e1685e30fcc776583d8c0aa7968616510847
+
+COCOAPODS: 0.36.3

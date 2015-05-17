@@ -19,4 +19,6 @@ typedef void(^LFReversibleTinderViewBlockVoid)			(void);
 @property (nonatomic, strong) LFReversibleTinderViewBlockVoid	block_next;	
 //@property (nonatomic, strong) id		delegate;
 
+- (void)skip;
+
 @end

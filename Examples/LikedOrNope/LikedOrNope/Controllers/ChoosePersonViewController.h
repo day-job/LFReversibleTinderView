@@ -31,6 +31,7 @@
 @interface ChoosePersonViewController : UIViewController <MDCSwipeToChooseDelegate>
 {
 	NSMutableArray*	views;
+    LFReversibleTinderView* view_swipe;
 }
 
 @property (nonatomic, strong) Person *currentPerson;
