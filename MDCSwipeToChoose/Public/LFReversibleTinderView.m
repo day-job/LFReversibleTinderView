@@ -115,7 +115,7 @@
 
 - (void)skip
 {
-    NSLog(@"skip");
+    //	NSLog(@"skip");
     if (self.index < swipe_views.count) {
         LFReversibleTinderSubview* view = swipe_views[self.index];
         [UIView animateWithDuration:0.3 animations:^{

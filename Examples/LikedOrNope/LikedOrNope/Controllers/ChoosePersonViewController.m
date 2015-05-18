@@ -155,7 +155,8 @@
                                          green:245.f/255.f
                                           blue:106.f/255.f
                                          alpha:1.f]];
-    [button addTarget:self action:@selector(action_reload) forControlEvents:UIControlEventTouchUpInside];
+    //[button addTarget:self action:@selector(action_reload) forControlEvents:UIControlEventTouchUpInside];
+    [button addTarget:self action:@selector(action_next) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:button];
 
 	//	set up views
@@ -167,7 +168,7 @@
 	}
 
 	//	set up swipe view
-	LFReversibleTinderView* view_swipe = [[LFReversibleTinderView alloc] initWithFrame:CGRectMake(0, 60, 320, 320)];
+	view_swipe = [[LFReversibleTinderView alloc] initWithFrame:CGRectMake(0, 60, 320, 320)];
 	view_swipe.swipe_views = views;
 	[self.view addSubview:view_swipe];
 	NSLog(@"dummy: %@", view_swipe.swipe_views);
@@ -181,6 +182,10 @@
 #pragma clang diagnostic ignored "-Wundeclared-selector"
 	[[[UIApplication sharedApplication] delegate] performSelector:@selector(setController)];
 #pragma clang diagnostic pop
+}
+
+- (void)action_next {
+    [view_swipe skip];
 }
 
 #pragma mark delegate

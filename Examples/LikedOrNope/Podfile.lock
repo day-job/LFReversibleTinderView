@@ -1,10 +1,10 @@
 PODS:
-  - LFReversibleTinderView (0.3.0)
+  - LFReversibleTinderView (HEAD based on 0.3.6)
 
 DEPENDENCIES:
-  - LFReversibleTinderView
+  - LFReversibleTinderView (HEAD)
 
 SPEC CHECKSUMS:
-  LFReversibleTinderView: fb0a9896e18802c2b876544b750a9fdb1b1275cd
+  LFReversibleTinderView: 7a08e1685e30fcc776583d8c0aa7968616510847
 
-COCOAPODS: 0.33.1
+COCOAPODS: 0.36.3

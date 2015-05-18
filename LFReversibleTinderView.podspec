@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'LFReversibleTinderView'
-  s.version = '0.3.6'
+  s.version = '0.3.7'
   s.summary = 'Reversible Tinder-like view. Based on MDCSwipeToChoose.'
   s.homepage = 'https://github.com/superarts/MDCSwipeToChoose'
   s.license = 'MIT'
