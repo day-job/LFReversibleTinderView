@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
   s.social_media_url = 'https://twitter.com/superarts_org'
   s.source = { :git => 'https://github.com/superarts/MDCSwipeToChoose.git', :tag => "#{s.version}" }
   s.source_files = 'MDCSwipeToChoose/**/*.{h,m}'
-  s.public_header_files = 'MDCSwipeToChoose/Public/**/*.{h,m}'
+  s.public_header_files = 'MDCSwipeToChoose/Public/**/*.{h}'
   s.requires_arc = true
   s.platform = :ios, '7.0'
   s.framework = 'UIKit'
