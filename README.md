@@ -4,6 +4,23 @@ This library is based on MDCSwipeToChoose, and as the name suggested, it's rever
 
 To use it, simply add "pod 'LFReversibleTinderView'" in your Podfile, and then do "pod install" and import "LFReversibleTinderView.h" to get started.
 
+### Swift Example
+
+	func setup_tinder() {
+		let view_tinder = LFReversibleTinderView(frame: CGRect(x: 0, y: 0, width: 300, height: 300))
+		view_tinder.backgroundColor = .green
+		let views = NSMutableArray()
+		for _ in 0 ..< 10 {
+			let view_test = LFReversibleTinderSubview(frame: CGRect(x: 10, y: 10, width: 100, height: 100))
+			view_test.backgroundColor = .blue
+			views.add(view_test)
+		}
+		view_tinder.swipe_views = views
+		view.addSubview(view_tinder)
+	}
+
+### Objective-C Exmple
+
 In the LikedOrNope example, ChoosePersonView is a subview of LFReversibleTinderSubview. You need to set up your subviews first:
 
 	//	set up views
@@ -24,7 +41,7 @@ And add it as subview:
 
 	[self.view addSubview:view_swipe];
 
-Done. Please note the the following section about MDCSwipeToChoose may not work with this lib, please get the origin one if you don't want reverse part.
+Done. Please note the the following section about MDCSwipeToChoose may not work with this lib, please get the origin one if you don't want the "reverse" part.
 
 The feature is there but this lib is still under tweak, so use it at your own risk. Checkour LFramework if you want some convinient helpers too! - https://github.com/superarts/LFramework
 
