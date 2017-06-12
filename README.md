@@ -4,7 +4,7 @@ This library is based on MDCSwipeToChoose, and as the name suggested, it's rever
 
 To use it, simply add "pod 'LFReversibleTinderView'" in your Podfile, and then do "pod install" and import "LFReversibleTinderView.h" to get started.
 
-### Swift Example
+### Swift 3.1 Example
 
 	func setup_tinder() {
 		let view_tinder = LFReversibleTinderView(frame: CGRect(x: 0, y: 0, width: 300, height: 300))
